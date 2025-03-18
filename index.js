@@ -9,7 +9,11 @@ async function startBot() {
     try {
         console.log("Memulai bot WhatsApp...");
         const authDir = path.join(__dirname, 'auth');
-        if (!fs.existsSync(authDir)) fs.mkdirSync(authDir);
+        if (!fs.existsSync(authDir)) fs.mkdirSync(authDir, { recursive: true });
+        
+        const imagesDir = path.join(__dirname, 'images');
+        if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
+        
         const { state, saveCreds } = await useMultiFileAuthState(authDir);
 
         const sock = makeWASocket({
@@ -22,7 +26,6 @@ async function startBot() {
         sock.ev.on('messages.upsert', async ({ messages }) => {
             try {
                 const msg = messages[0];
-
                 if (!msg || !msg.message || msg.key.fromMe) return;
 
                 const allowedGroups = ['120363414202287808@g.us'];
@@ -88,7 +91,7 @@ async function startBot() {
                 const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== 401;
                 console.log(`Koneksi terputus. Reconnecting: ${shouldReconnect}`);
                 if (shouldReconnect) {
-                    startBot(); // Restart bot jika bukan error autentikasi
+                    setTimeout(startBot, 5000); // Restart bot dengan delay 5 detik
                 }
             } else if (connection === 'open') {
                 console.log("Bot berhasil terkoneksi ke WhatsApp!");
@@ -96,29 +99,24 @@ async function startBot() {
         });
 
         console.log("Bot WhatsApp berhasil dijalankan!");
-
     } catch (error) {
         console.error("Error saat menjalankan bot:", error);
     }
 }
 
-// Buat server Express untuk health check
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 app.get("/", (req, res) => {
     res.status(200).json({ status: "ok", message: "Bot WhatsApp is running!" });
 });
 
-// Tambahkan route khusus health check
 app.get("/health", (req, res) => {
     res.status(200).json({ status: "ok", message: "Health check passed!" });
 });
 
-// Pastikan server mendengarkan di semua alamat IP
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Health check running on port ${PORT}`);
 });
 
-// Jalankan bot dalam mode aman
 startBot();
