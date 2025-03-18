@@ -90,7 +90,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
-    res.send("Bot WhatsApp is running!");
+    res.status(200).json({ status: "ok", message: "Bot WhatsApp is running!" });
 });
 
 app.listen(PORT, () => {
