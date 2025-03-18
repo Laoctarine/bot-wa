@@ -93,7 +93,13 @@ app.get("/", (req, res) => {
     res.status(200).json({ status: "ok", message: "Bot WhatsApp is running!" });
 });
 
-app.listen(PORT, () => {
+// Tambahkan route khusus health check
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "ok", message: "Health check passed!" });
+});
+
+// Pastikan server mendengarkan di semua alamat IP
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Health check running on port ${PORT}`);
 });
 
