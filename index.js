@@ -76,17 +76,26 @@ async function startBot() {
                 }
             }
         });
+
+        console.log("Bot WhatsApp berhasil dijalankan!");
+
     } catch (error) {
         console.error("Error saat menjalankan bot:", error);
+        process.exit(1); // Keluar dengan status error
     }
 }
 
+// Buat server Express untuk health check
 const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.get("/", (req, res) => {
     res.send("Bot WhatsApp is running!");
 });
-app.listen(3000, () => {
-    console.log("Health check running on port 3000");
+
+app.listen(PORT, () => {
+    console.log(`Health check running on port ${PORT}`);
 });
 
+// Jalankan bot
 startBot();
